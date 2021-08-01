@@ -1,19 +1,19 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 
-import { Layout, Button, Text } from "@ui-kitten/components";
-import PhoneInput from "react-native-phone-number-input";
-import instance from "../../store/actions/instance";
-import CodeInput from "react-native-code-input";
-import { signin } from "../../store/actions/authActions";
+import { Button, Text } from 'native-base';
+import PhoneInput from 'react-native-phone-number-input';
+import instance from '../../store/actions/instance';
+import CodeInput from 'react-native-code-input';
+import { signin } from '../../store/actions/authActions';
 
 const Signin = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState();
-  const [page, setPage] = useState("login");
+  const [page, setPage] = useState('login');
   const [error, setError] = useState(false);
   const dispatch = useDispatch();
   const handleSubmit = async (code) => {
-    if (page === "login") {
+    if (page === 'login') {
       console.log(phoneNumber);
       const res = await instance.post(`/api/v1/users/`, { phoneNumber });
       console.log(res.data);
@@ -23,8 +23,8 @@ const Signin = ({ navigation }) => {
     }
   };
   return (
-    <Layout style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      {page === "login" ? (
+    <>
+      {page === 'login' ? (
         <>
           <PhoneInput
             defaultCode="JO"
@@ -48,7 +48,7 @@ const Signin = ({ navigation }) => {
             inactiveColor="rgba(26, 35, 126, 1)"
             autoFocus={true}
             inputPosition="center"
-            borderType={"underline"}
+            borderType={'underline'}
             codeLength={6}
             size={50}
             onFulfill={(code) => handleSubmit(code)}
@@ -57,7 +57,7 @@ const Signin = ({ navigation }) => {
           <Text>your code is {page}</Text>
         </>
       )}
-    </Layout>
+    </>
   );
 };
 export default Signin;

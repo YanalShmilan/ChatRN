@@ -1,9 +1,8 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 // import ContactItem from './ContactItem';
-import { List, ListItem, Icon } from "@ui-kitten/components";
-import { StyleSheet } from "react-native";
-import { Layout, Text } from "@ui-kitten/components";
+import { StyleSheet } from 'react-native';
+import { List, Heading, Box, Text, Image } from 'native-base';
 
 const Chat = () => {
   let chats = useSelector((state) => state.chats.chats);
@@ -60,9 +59,44 @@ const Chat = () => {
       // setRoomId(chat._id);
     }
     //if (notSeenRoom) return;
-    return {
-      title: chat.createdAt,
-    };
+    return (
+      // list item
+      <List.Item>
+        {chat.photo !== 'no-photo.jpg' ? (
+          <Image
+            size={50}
+            resizeMode={'contain'}
+            borderRadius={100}
+            source={{
+              uri: chat.photo,
+            }}
+            alt="Alternate Text"
+          />
+        ) : (
+          <Image
+            size={50}
+            resizeMode={'contain'}
+            borderRadius={100}
+            source={{
+              uri: 'https://icon-library.com/images/no-photo-available-icon/no-photo-available-icon-20.jpg',
+            }}
+            alt="Alternate Text"
+          />
+        )}
+        <Text>
+          {chat.name} {'\n'}
+          {'\n'}
+        </Text>
+        {chat.messages.length > 0 ? (
+          <Text>
+            {'\n'}
+            {chat.messages[chat.messages.length - 1].content.text}
+          </Text>
+        ) : (
+          <Text></Text>
+        )}
+      </List.Item>
+    );
     // <ContactItem
     //   room={chat}
     //   name={chat.name}
@@ -76,16 +110,15 @@ const Chat = () => {
     //   notSeenCount={notSeenCount}
     // />
   });
-  const renderItem = ({ item, index }) => (
-    <ListItem title={`${item.title} ${index + 1}`} />
-  );
-  const data = new Array(8).fill({
-    title: "Item",
-  });
   return (
     <>
       <Text>Chats</Text>
-      <List data={chats} renderItem={renderItem} />
+      <Box w="80%">
+        <Heading fontSize={24}>Topics (Plain List)</Heading>
+        <List space={2} my={2}>
+          {chats}
+        </List>
+      </Box>
     </>
   );
 };
