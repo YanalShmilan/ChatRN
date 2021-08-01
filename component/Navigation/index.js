@@ -1,8 +1,8 @@
-import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
-import { useSelector } from "react-redux";
-import Chat from "../Chat";
-import Signin from "../auth/Signin";
+import React from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
+import { useSelector } from 'react-redux';
+import Chat from '../Chat';
+import Signin from '../auth/Signin';
 
 const { Navigator, Screen } = createStackNavigator();
 const RootNavigator = () => {
@@ -19,7 +19,7 @@ const RootNavigator = () => {
             name="Home"
             component={Chat}
             options={({ route, navigation }) => ({
-              title: "Whatsapp",
+              title: 'Whatsapp',
               headerRight: () => <></>,
             })}
           />
