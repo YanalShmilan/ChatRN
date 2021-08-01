@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
 // import ContactItem from './ContactItem';
-import { Button, Icon, List, ListItem } from '@ui-kitten/components';
-import { StyleSheet } from 'react-native';
-import { Layout, Text } from '@ui-kitten/components';
+import { List, ListItem, Icon } from "@ui-kitten/components";
+import { StyleSheet } from "react-native";
+import { Layout, Text } from "@ui-kitten/components";
+
 const Chat = () => {
   let chats = useSelector((state) => state.chats.chats);
+  let channels = useSelector((state) => state.chats.channels);
+  let user = useSelector((state) => state.user.user);
 
   if (!chats) {
     return <></>;
   }
-  let channels = useSelector((state) => state.chats.channels);
-  let user = useSelector((state) => state.user.user);
   chats.sort((a, b) => {
     // if no messages in both rooms then order by room creation
     if (
@@ -58,41 +59,34 @@ const Chat = () => {
       notSeenRoom = true;
       // setRoomId(chat._id);
     }
-    // if (notSeenRoom) return;
-    return (
-      <ListItem
-        title={'chatnae'}
-        description={`desc`}
-        accessoryLeft={'photo'}
-        accessoryRight={'mute'}
-      />
-      // <ContactItem
-      //   room={chat}
-      //   name={chat.name}
-      //   photo={chat.photo}
-      //   lastMessage={
-      //     chat.messages.length > 0
-      //       ? chat.messages[chat.messages.length - 1]
-      //       : ''
-      //   }
-      //   setRoomId={setRoomId}
-      //   notSeenCount={notSeenCount}
-      // />
-    );
+    //if (notSeenRoom) return;
+    return {
+      title: chat.createdAt,
+    };
+    // <ContactItem
+    //   room={chat}
+    //   name={chat.name}
+    //   photo={chat.photo}
+    //   lastMessage={
+    //     chat.messages.length > 0
+    //       ? chat.messages[chat.messages.length - 1]
+    //       : ''
+    //   }
+    //   setRoomId={setRoomId}
+    //   notSeenCount={notSeenCount}
+    // />
+  });
+  const renderItem = ({ item, index }) => (
+    <ListItem title={`${item.title} ${index + 1}`} />
+  );
+  const data = new Array(8).fill({
+    title: "Item",
   });
   return (
-    <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <List
-        style={styles.container}
-        data={chats}
-        // renderItem={renderItem}
-      />
-    </Layout>
+    <>
+      <Text>Chats</Text>
+      <List data={chats} renderItem={renderItem} />
+    </>
   );
 };
 export default Chat;
-const styles = StyleSheet.create({
-  container: {
-    maxHeight: 192,
-  },
-});
