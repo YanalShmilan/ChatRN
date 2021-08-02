@@ -151,7 +151,9 @@ export const addUserToGroup = (roomId, phoneNumber) => {
 export const fetchRoom = (userId) => {
   return async (dispatch) => {
     try {
-      const res = await instance.get(`api/v1/rooms/user/${userId}`);
+      const res = await instance.put(`api/v1/rooms/user/${userId}`, {
+        publicKey: null,
+      });
       let rooms = res.data.map((room) => {
         if (room.type === "Private") {
           let otherUser = room.users.find((user) => user._id !== userId);

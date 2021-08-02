@@ -20,6 +20,8 @@
     "@ui-kitten/components": "^5.1.1",
     "add": "^2.0.6",
     "axios": "^0.21.1",
+    "create-ecdh": "^4.0.4",
+    "crypto-js": "^4.1.1",
     "expo": "~42.0.1",
     "expo-image-picker": "~10.2.2",
     "expo-location": "~12.1.2",
