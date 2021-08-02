@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 
-import { Layout, Button, Text } from "@ui-kitten/components";
 import PhoneInput from "react-native-phone-number-input";
 import instance from "../../store/actions/instance";
 import CodeInput from "react-native-code-input";
 import { signin } from "../../store/actions/authActions";
+import { View, Text, Button } from "react-native-ui-lib";
 
-const Signin = ({ navigation }) => {
+const Signin = () => {
   const [phoneNumber, setPhoneNumber] = useState();
   const [page, setPage] = useState("login");
   const [error, setError] = useState(false);
@@ -23,7 +23,7 @@ const Signin = ({ navigation }) => {
     }
   };
   return (
-    <Layout style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+    <View flex paddingH-25 paddingT-120>
       {page === "login" ? (
         <>
           <PhoneInput
@@ -36,9 +36,16 @@ const Signin = ({ navigation }) => {
             withShadow
             autoFocus
           />
-          <Text></Text>
-          <Text></Text>
-          <Button onPress={handleSubmit}>BUTTON</Button>
+          <View marginT-50 center>
+            <Button
+              onPress={handleSubmit}
+              text70
+              white
+              background-orange30
+              label="Login"
+              marginT-30
+            />
+          </View>
         </>
       ) : (
         <>
@@ -57,7 +64,7 @@ const Signin = ({ navigation }) => {
           <Text>your code is {page}</Text>
         </>
       )}
-    </Layout>
+    </View>
   );
 };
 export default Signin;
