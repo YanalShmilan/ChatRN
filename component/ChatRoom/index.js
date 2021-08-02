@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Image, Clipboard } from "react-native";
+import { ScrollView, StyleSheet, Image, Clipboard, Share } from "react-native";
 import {
-  TouchableOpacity,
   Text,
   View,
   TextField,
@@ -20,6 +19,10 @@ import {
 } from "react-native-popup-menu";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { deleteMessage } from "../../store/actions/chatActions";
+import * as ImagePicker from "expo-image-picker";
+import * as Location from "expo-location";
+
+import instance from "../../store/actions/instance";
 
 const ChatRoom = ({ route, socket }) => {
   const dispatch = useDispatch();
@@ -34,6 +37,57 @@ const ChatRoom = ({ route, socket }) => {
       socket.emit("roomSeen", { userId: user._id, roomId: _id });
     }
   }, []);
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (result.cancelled) {
+      return;
+    }
+    let localUri = result.uri;
+    let filename = localUri.split("/").pop();
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
+    const formData = new FormData();
+    formData.append("file", { uri: localUri, name: filename, type });
+    const res = await instance.post(`/api/v1/rooms/attachment`, formData);
+    let content = {};
+    content.text = "[image]";
+    content.type = "image";
+    content.url = res.data;
+    socket.emit("chatMessage", {
+      roomId: _id,
+      content: content,
+      userId: user.id,
+    });
+
+    // if (!result.cancelled) {
+    //   setImage(result.uri);
+    // }
+  };
+
+  const handleSubmitLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      console.log("Permission to access location was denied");
+      return;
+    }
+    let location = await Location.getCurrentPositionAsync({});
+    let content = {};
+    content.type = "location";
+    content.text = "[location]";
+    content.latitude = location.coords.latitude;
+    content.longitude = location.coords.longitude;
+    socket.emit("chatMessage", {
+      roomId: _id,
+      content: content,
+      userId: user.id,
+    });
+  };
+
   const handleSubmit = () => {
     if (input === "") return;
     let content = {};
@@ -111,6 +165,15 @@ const ChatRoom = ({ route, socket }) => {
                 }}
               />
             );
+          } else if (type === "location") {
+            text = (
+              <Image
+                style={{ width: 200, height: 200 }}
+                source={{
+                  uri: `https://maps.googleapis.com/maps/api/staticmap?zoom=14&size=400x200&maptype=roadmap&markers=color:red%7C${message.content.latitude},${message.content.longitude}&key=AIzaSyB8HneuExnTiRIBHmBMNsoJP33ymZg2mg4`,
+                }}
+              />
+            );
           } else {
             text = (
               <Text
@@ -133,48 +196,53 @@ const ChatRoom = ({ route, socket }) => {
                 padding-s2
                 width={"70%"}
               >
-                <TouchableOpacity onLongPress={() => console("test")}>
-                  <Menu>
-                    <MenuTrigger>
-                      <Text dark10 text70 style={{ alignSelf: "flex-end" }}>
-                        <Icon
-                          name="angle-down"
-                          size={20}
-                          color={!isLeftBubble ? "#ffffff" : "#333"}
-                        />
-                      </Text>
-                    </MenuTrigger>
-                    <MenuOptions>
-                      <MenuOption
-                        onSelect={() =>
-                          Clipboard.setString(message.content.text)
-                        }
-                        text="Copy"
+                <Menu>
+                  <MenuTrigger>
+                    <Text dark10 text70 style={{ alignSelf: "flex-end" }}>
+                      <Icon
+                        name="angle-down"
+                        size={20}
+                        color={!isLeftBubble ? "#ffffff" : "#333"}
                       />
+                    </Text>
+                  </MenuTrigger>
+                  <MenuOptions>
+                    <MenuOption
+                      onSelect={() => Clipboard.setString(message.content.text)}
+                      text="Copy"
+                    />
+                    <MenuOption
+                      onSelect={() =>
+                        Share.share({
+                          message: message.content.text,
+                        })
+                      }
+                      text="Share"
+                    />
+
+                    <MenuOption
+                      onSelect={() =>
+                        dispatch(deleteMessage(user._id, message._id, _id))
+                      }
+                    >
+                      <Text style={{ color: "red" }}>Delete</Text>
+                    </MenuOption>
+                    {!isLeftBubble && (
                       <MenuOption
                         onSelect={() =>
-                          dispatch(deleteMessage(user._id, message._id, _id))
+                          socket.emit("messageUpdate", {
+                            messageId: message._id,
+                            content: { text: "[deleted]", type: "deleted" },
+                          })
                         }
                       >
-                        <Text style={{ color: "red" }}>Delete</Text>
+                        <Text style={{ color: "red" }}>Delete for all</Text>
                       </MenuOption>
-                      {!isLeftBubble && (
-                        <MenuOption
-                          onSelect={() =>
-                            socket.emit("messageUpdate", {
-                              messageId: message._id,
-                              content: { text: "[deleted]", type: "deleted" },
-                            })
-                          }
-                        >
-                          <Text style={{ color: "red" }}>Delete for all</Text>
-                        </MenuOption>
-                      )}
-                    </MenuOptions>
-                  </Menu>
-                  {text}
-                  {seenStatus}
-                </TouchableOpacity>
+                    )}
+                  </MenuOptions>
+                </Menu>
+                {text}
+                {seenStatus}
               </View>
             </View>
           );
@@ -211,8 +279,14 @@ const ChatRoom = ({ route, socket }) => {
             floatOnFocus
             enableErrors={false}
             onEndEditing={handleSubmit}
+            returnKeyType={"send"}
           />
-          <Button onPress={handleSubmit} label="Send" link marginL-s4 />
+          <Button link marginL-s4 onPress={pickImage}>
+            <Icon name="image" size={15} color={"#333"} />
+          </Button>
+          <Button link marginL-s4 onPress={handleSubmitLocation}>
+            <Icon name="location-arrow" size={15} color={"#333"} />
+          </Button>
         </View>
       </View>
     </MenuProvider>
