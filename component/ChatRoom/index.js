@@ -1,5 +1,19 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import {
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+  MenuProvider,
+} from "react-native-popup-menu";
+import * as ImagePicker from "expo-image-picker";
+import * as Location from "expo-location";
+
+//Styling
 import { ScrollView, StyleSheet, Image, Clipboard, Share } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
 import {
   Text,
   View,
@@ -9,34 +23,29 @@ import {
   Constants,
   Spacings,
 } from "react-native-ui-lib";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  Menu,
-  MenuOptions,
-  MenuOption,
-  MenuTrigger,
-  MenuProvider,
-} from "react-native-popup-menu";
-import Icon from "react-native-vector-icons/FontAwesome";
-import { deleteMessage } from "../../store/actions/chatActions";
-import * as ImagePicker from "expo-image-picker";
-import * as Location from "expo-location";
 
+//Actions
+import { deleteMessage } from "../../store/actions/chatActions";
 import instance from "../../store/actions/instance";
 
 const ChatRoom = ({ route, socket }) => {
   const dispatch = useDispatch();
+
   const user = useSelector((state) => state.user.user);
   let chats = useSelector((state) => state.chats.chats);
 
   let room = chats.find((chat) => route.params.room._id === chat._id);
+
   const [input, setInput] = useState("");
+
   const { messages, _id } = room;
+
   useEffect(() => {
     if (socket) {
       socket.emit("roomSeen", { userId: user._id, roomId: _id });
     }
   }, []);
+
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -44,16 +53,20 @@ const ChatRoom = ({ route, socket }) => {
       aspect: [4, 3],
       quality: 1,
     });
+
     if (result.cancelled) {
       return;
     }
+
     let localUri = result.uri;
     let filename = localUri.split("/").pop();
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
+
     const formData = new FormData();
     formData.append("file", { uri: localUri, name: filename, type });
     const res = await instance.post(`/api/v1/rooms/attachment`, formData);
+
     let content = {};
     content.text = "[image]";
     content.type = "image";
@@ -66,16 +79,19 @@ const ChatRoom = ({ route, socket }) => {
 
     // if (!result.cancelled) {
     //   setImage(result.uri);
-    // }
+    // } //Remove unused code
   };
 
   const handleSubmitLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
+
     if (status !== "granted") {
       console.log("Permission to access location was denied");
       return;
     }
+
     let location = await Location.getCurrentPositionAsync({});
+
     let content = {};
     content.type = "location";
     content.text = "[location]";
@@ -90,6 +106,7 @@ const ChatRoom = ({ route, socket }) => {
 
   const handleSubmit = () => {
     if (input === "") return;
+
     let content = {};
     content.text = input;
     content.type = "string";
@@ -100,11 +117,13 @@ const ChatRoom = ({ route, socket }) => {
     });
     setInput("");
   };
+
   const renderChatBubbles = () => {
     return (
       <View flex>
         {messages.map((message) => {
           const isLeftBubble = user._id !== message.user._id;
+
           let seenBy = message.receivers.filter(
             (receiver) => receiver.seen !== null
           );
@@ -113,35 +132,41 @@ const ChatRoom = ({ route, socket }) => {
           let receivedBy = message.receivers.filter(
             (receiver) => receiver.received !== null
           );
+
           let seenStatus = <></>;
+
           if (!isLeftBubble) {
             if (seenBy.length === message.receivers.length) {
               seenStatus = (
+                //Remove inline styling
                 <Text dark10 text70 style={{ alignSelf: "flex-end" }}>
                   <Icon name="check-circle" size={15} color={"#00FF00"} />
                 </Text>
               );
             } else if (receivedBy.length !== 0) {
               seenStatus = (
+                //Remove inline styling
                 <Text dark10 text70 style={{ alignSelf: "flex-end" }}>
                   <Icon name="check-circle" size={15} color={"#ffffff"} />
                 </Text>
               );
             } else {
               seenStatus = (
+                //Remove inline styling
                 <Text dark10 text70 style={{ alignSelf: "flex-end" }}>
                   <Icon name="check-circle-o" size={15} color={"#ffffff"} />
                 </Text>
               );
             }
           }
+
           let type = message.content.type;
           let text;
 
           if (type === "image") {
             text = (
               <Image
-                style={{ width: 200, height: 200 }}
+                style={{ width: 200, height: 200 }} //Remove inline styling
                 source={{
                   uri: message.content.url.replace(
                     "localhost",
@@ -153,7 +178,7 @@ const ChatRoom = ({ route, socket }) => {
           } else if (type === "giphy") {
             text = (
               <Image
-                style={{ width: 200, height: 200 }}
+                style={{ width: 200, height: 200 }} //Remove inline styling
                 source={{
                   uri:
                     "https://media.giphy.com/media/" +
@@ -168,7 +193,7 @@ const ChatRoom = ({ route, socket }) => {
           } else if (type === "location") {
             text = (
               <Image
-                style={{ width: 200, height: 200 }}
+                style={{ width: 200, height: 200 }} //Remove inline styling
                 source={{
                   uri: `https://maps.googleapis.com/maps/api/staticmap?zoom=14&size=400x200&maptype=roadmap&markers=color:red%7C${message.content.latitude},${message.content.longitude}&key=AIzaSyB8HneuExnTiRIBHmBMNsoJP33ymZg2mg4`,
                 }}
@@ -198,6 +223,7 @@ const ChatRoom = ({ route, socket }) => {
               >
                 <Menu>
                   <MenuTrigger>
+                    {/**Remove inline styling */}
                     <Text dark10 text70 style={{ alignSelf: "flex-end" }}>
                       <Icon
                         name="angle-down"
@@ -225,6 +251,7 @@ const ChatRoom = ({ route, socket }) => {
                         dispatch(deleteMessage(user._id, message._id, _id))
                       }
                     >
+                      {/**Remove inline styling */}
                       <Text style={{ color: "red" }}>Delete</Text>
                     </MenuOption>
                     {!isLeftBubble && (
@@ -236,6 +263,7 @@ const ChatRoom = ({ route, socket }) => {
                           })
                         }
                       >
+                        {/**Remove inline styling */}
                         <Text style={{ color: "red" }}>Delete for all</Text>
                       </MenuOption>
                     )}

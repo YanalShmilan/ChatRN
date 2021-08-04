@@ -12,6 +12,7 @@ const reducer = (state = initialState, action) => {
         chats: action.payload,
       };
     }
+
     case actionTypes.CREATE_ROOM: {
       let roomExist = state.chats.find(
         (chat) => chat._id === action.payload._id
@@ -24,6 +25,7 @@ const reducer = (state = initialState, action) => {
         chats: [...state.chats, { ...action.payload, messages: [] }],
       };
     }
+
     case actionTypes.ADD_MESSAGE: {
       let newChatAfterMessage = state.chats.map((chat) => {
         if (action.payload.roomId === chat._id) {
@@ -44,12 +46,14 @@ const reducer = (state = initialState, action) => {
         chats: newChatAfterMessage,
       };
     }
+
     case actionTypes.FETCH_CHANNELS: {
       return {
         ...state,
         channels: action.payload,
       };
     }
+
     case actionTypes.SEEN_MESSAGE: {
       let seenRoom = state.chats.find(
         (chat) => action.payload.roomId === chat._id
@@ -74,6 +78,7 @@ const reducer = (state = initialState, action) => {
         ),
       };
     }
+
     case actionTypes.READ_MESSAGE: {
       let readRooms = state.chats.map((chat) => {
         if (action.payload.roomIds.includes(chat._id)) {
@@ -97,6 +102,7 @@ const reducer = (state = initialState, action) => {
         chats: readRooms,
       };
     }
+
     case actionTypes.UPDATE_MESSAGE: {
       let updatedRoom = state.chats.find(
         (chat) => action.payload.roomId === chat._id
@@ -107,7 +113,7 @@ const reducer = (state = initialState, action) => {
         }
         return message;
       });
-      console.log(updatedRoom.messages);
+      console.log(updatedRoom.messages); //Remove console log
       return {
         ...state,
         chats: state.chats.map((chat) =>
@@ -115,6 +121,7 @@ const reducer = (state = initialState, action) => {
         ),
       };
     }
+
     case actionTypes.DELETE_MESSAGE: {
       let deletedFromRoom = state.chats.find(
         (chat) => action.payload.roomId === chat._id
@@ -129,6 +136,7 @@ const reducer = (state = initialState, action) => {
         ),
       };
     }
+
     default:
       return state;
   }

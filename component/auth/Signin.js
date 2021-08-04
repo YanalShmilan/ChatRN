@@ -1,27 +1,33 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 
+//Styling
 import PhoneInput from "react-native-phone-number-input";
-import instance from "../../store/actions/instance";
 import CodeInput from "react-native-code-input";
-import { signin } from "../../store/actions/authActions";
 import { View, Text, Button } from "react-native-ui-lib";
+
+//Actions
+import instance from "../../store/actions/instance";
+import { signin } from "../../store/actions/authActions";
 
 const Signin = () => {
   const [phoneNumber, setPhoneNumber] = useState();
   const [page, setPage] = useState("login");
   const [error, setError] = useState(false);
+
   const dispatch = useDispatch();
+
   const handleSubmit = async (code) => {
     if (page === "login") {
       console.log(phoneNumber);
       const res = await instance.post(`/api/v1/users/`, { phoneNumber });
-      console.log(res.data);
+      console.log(res.data); //Remove console log
       setPage(res.data);
     } else {
       dispatch(signin(phoneNumber, code, setError));
     }
   };
+
   return (
     <View flex paddingH-25 paddingT-120>
       {page === "login" ? (

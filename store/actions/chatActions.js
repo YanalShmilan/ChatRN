@@ -13,6 +13,7 @@ export const addMessage = (roomId, content) => {
     }
   };
 };
+
 export const seeMessage = (roomId, userId, time) => {
   return async (dispatch) => {
     try {
@@ -25,6 +26,7 @@ export const seeMessage = (roomId, userId, time) => {
     }
   };
 };
+
 export const readMessage = (roomIds, userId, time) => {
   return async (dispatch) => {
     try {
@@ -41,7 +43,7 @@ export const readMessage = (roomIds, userId, time) => {
 export const updateMessage = (roomId, newMessage) => {
   return async (dispatch) => {
     try {
-      console.log();
+      console.log(); //Remove console log
       dispatch({
         type: actionTypes.UPDATE_MESSAGE,
         payload: { roomId, newMessage },
@@ -51,6 +53,7 @@ export const updateMessage = (roomId, newMessage) => {
     }
   };
 };
+
 export const deleteMessage = (userId, messageId, roomId) => {
   return async (dispatch) => {
     try {
@@ -64,6 +67,7 @@ export const deleteMessage = (userId, messageId, roomId) => {
     }
   };
 };
+
 export const createRoom = (room, userId) => {
   return async (dispatch) => {
     try {
@@ -94,7 +98,7 @@ export const createRoom = (room, userId) => {
 export const updateRoom = (roomId, roomInfo) => {
   return async (dispatch) => {
     try {
-      console.log(roomInfo);
+      console.log(roomInfo); //Remove console log
       const formData = new FormData();
       for (const key in roomInfo) formData.append(key, roomInfo[key]);
 
@@ -115,7 +119,7 @@ export const removeUserFromGroup = (roomId, phoneNumber) => {
       const userToRemove = {
         to: phoneNumber,
       };
-      console.log(roomId);
+      console.log(roomId); //Remove console log
       const res = await instance.post(
         `/api/v1/rooms/${roomId}/remove`,
         userToRemove
@@ -136,7 +140,7 @@ export const addUserToGroup = (roomId, phoneNumber) => {
       const userToAdd = {
         to: phoneNumber,
       };
-      console.log(roomId);
+      console.log(roomId); //Remove console log
       const res = await instance.post(`/api/v1/rooms/${roomId}/add`, userToAdd);
       dispatch({
         type: actionTypes.ADD_USER_TO_GROUP,

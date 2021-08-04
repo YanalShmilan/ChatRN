@@ -10,7 +10,7 @@ export const signin = (phoneNumber, code, setError) => {
         code,
       });
       if (res.data) {
-        console.log("success");
+        console.log("success"); //Remove console log
         dispatch(fetchRoom(res.data._id));
         dispatch({
           type: actionTypes.LOGIN,
@@ -26,6 +26,7 @@ export const signin = (phoneNumber, code, setError) => {
     }
   };
 };
+
 export const signout = (history, socket) => {
   return async (dispatch) => {
     try {

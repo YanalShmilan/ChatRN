@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { StyleSheet, Alert, FlatList } from "react-native";
+
+//Styling
+import { StyleSheet, Alert, FlatList } from "react-native"; //Remove unused import
 import * as Animatable from "react-native-animatable";
 import nophoto from "../../assets/no-photo.png";
 import {
@@ -10,6 +12,8 @@ import {
   ListItem,
   Text,
 } from "react-native-ui-lib"; //eslint-disable-line
+
+//Actions
 import {
   addMessage,
   fetchRoom,
@@ -25,6 +29,7 @@ const Chat = ({ navigation, socket }) => {
 
   let chats = useSelector((state) => state.chats.chats);
   let user = useSelector((state) => state.user.user);
+
   if (chats && socket && loading === false) {
     setLoading(true);
   }
@@ -36,15 +41,19 @@ const Chat = ({ navigation, socket }) => {
       socket.off("roomSeen");
       socket.off("messageRead");
       socket.off("message");
+
       socket.on("messageUpdate", ({ roomId, newMessage }) => {
         dispatch(updateMessage(roomId, newMessage));
       });
+
       socket.on("roomSeen", ({ userId, roomId, time }) => {
         dispatch(seeMessage(roomId, userId, time));
       });
+
       socket.on("messageRead", ({ userId, roomIds, time }) => {
         dispatch(readMessage(roomIds, userId, time));
       });
+
       socket.on("message", (message) => {
         if (chats.find((chat) => chat._id === message.roomId))
           dispatch(addMessage(message.roomId, message.content));
@@ -52,6 +61,7 @@ const Chat = ({ navigation, socket }) => {
       });
     }
   }, [loading]);
+
   if (!chats || !user) return <></>;
 
   chats.sort((a, b) => {
@@ -73,6 +83,7 @@ const Chat = ({ navigation, socket }) => {
       ? -1
       : 1;
   });
+
   chats = chats.map((chat) => {
     let notSeenCount = chat.messages
       .map((message) => {
@@ -83,6 +94,7 @@ const Chat = ({ navigation, socket }) => {
         return thisCount.length;
       })
       .filter((a) => a).length;
+
     return {
       room: chat,
       name: chat.name,
@@ -96,6 +108,7 @@ const Chat = ({ navigation, socket }) => {
   const renderRow = (row, id) => {
     const animationProps = AnimatableManager.presets.fadeInRight;
     const imageAnimationProps = AnimatableManager.getRandomDelay();
+
     return (
       <Animatable.View {...animationProps}>
         <ListItem
@@ -117,6 +130,7 @@ const Chat = ({ navigation, socket }) => {
               {...imageAnimationProps}
             />
           </ListItem.Part>
+          {/**Remove inline styling */}
           <ListItem.Part
             middle
             column
@@ -163,6 +177,7 @@ const Chat = ({ navigation, socket }) => {
     />
   );
 };
+
 const styles = StyleSheet.create({
   image: {
     width: 54,
@@ -175,4 +190,5 @@ const styles = StyleSheet.create({
     borderColor: Colors.dark70,
   },
 });
+
 export default Chat;
